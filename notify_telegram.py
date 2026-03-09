@@ -32,15 +32,20 @@ CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
 API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
 
-def send(text: str) -> bool:
-    """Send a message. Returns True on success."""
-    if not BOT_TOKEN or not CHAT_ID:
+def send(text: str, chat_id=None) -> bool:
+    """Send a message. Returns True on success.
+
+    chat_id overrides TELEGRAM_CHAT_ID env var (useful when the recipient
+    is known from a previous Telegram conversation, e.g. in schedule_run.py).
+    """
+    target = chat_id or CHAT_ID
+    if not BOT_TOKEN or not target:
         print("TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set — skipping notification")
         return False
     try:
         resp = requests.post(
-            API_URL,
-            json={"chat_id": CHAT_ID, "text": text, "parse_mode": "HTML"},
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+            json={"chat_id": target, "text": text, "parse_mode": "HTML"},
             timeout=10,
         )
         resp.raise_for_status()
