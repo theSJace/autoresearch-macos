@@ -136,3 +136,33 @@ uv run score_transcript.py transcript.txt
 ```
 
 The script handles arbitrarily long transcripts via sliding-window chunking.
+
+## Telegram integration (optional)
+
+### Overnight progress notifications
+
+If `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are set as environment variables,
+call `notify_telegram.py` after logging each experiment result so you wake up to
+a full summary on your phone instead of having to read a terminal log.
+
+Add this step after recording in `results.tsv` (step 7 in the experiment loop):
+
+```bash
+uv run notify_telegram.py "keep | acc=0.801 | auc=0.863 | LM_LOSS_WEIGHT=0.1 adds regularisation"
+# or for a discard:
+uv run notify_telegram.py "discard | acc=0.775 | depth=8 overfits on small dataset"
+```
+
+Use `notify_telegram.format_experiment_result()` for consistent formatting when
+calling from Python.
+
+### Scoring bot
+
+Run `telegram_bot.py` on any machine with the trained model. Then send any text
+directly in Telegram and get a BULLISH/BEARISH score back instantly:
+
+```bash
+uv run telegram_bot.py    # runs until Ctrl-C
+```
+
+See `notify_telegram.py` for setup instructions (BotFather → token → chat ID).
